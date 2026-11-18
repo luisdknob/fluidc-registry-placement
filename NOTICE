@@ -1,0 +1,10 @@
+IC2E 2021 reproducibility snapshot
+Copyright 2021 Luis Augusto Dias Knob, Francescomaria Faticanti, Tiago Ferreto, Domenico Siracusa
+
+This repository contains the paper-era ContainerSim simulator and the archived
+result files used for the IC2E 2021 paper "Community-based Placement of
+Registries to Speed Up Application Deployment on Edge Computing."
+
+The PESS scheduler is an external project by R. Doriguzzi-Corin et al.,
+licensed under Apache-2.0 (https://github.com/doriguzzi/pess-security). It is
+not included in this repository; only archived PESS schedules/outputs are used.

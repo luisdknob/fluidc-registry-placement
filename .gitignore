@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+logs/*.log
+logs/runs/
+reports/*.json
+results/*.json
+runs/*.json
+fig3.png
+logs/*.out
+*.pdf
+.DS_Store
