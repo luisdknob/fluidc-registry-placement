@@ -44,6 +44,8 @@ def host_occupation(messages, hosts, filename):
             if message.transmitted == 0:
                 bandwidth = 0.0
                 continue
+            elif message.finish_time == message.start_time:
+                bandwidth = 0.0
             else:
                 bandwidth = message.size/(message.finish_time-message.start_time)
             entry['messages'].append({"name":message.name, "id":message.id, "start_time":message.start_time, "finish_time":message.finish_time, "bandwidth_mean":bandwidth, "size":message.size})
@@ -74,6 +76,8 @@ def cache_status(topo, filename):
                 #file.write("Cache Hit: %d/%d = %.3f\n" %(host["cache"][0], host["cache"][0]+host["cache"][1], (host["cache"][0]/(host["cache"][0]+host["cache"][1]))*100))
                 #file.write("Cache Miss: %d/%d = %.3f\n\n" %(host["cache"][1], host["cache"][0]+host["cache"][1], (host["cache"][1]/(host["cache"][0]+host["cache"][1]))*100))
 
+    file.close()
+
 def container_instantiation_time(messages, topo, filename):
     file = open('reports/'+filename+"-container_time.json", 'w')
     file.write("{\n\"containers\":\n")
@@ -85,6 +89,7 @@ def container_instantiation_time(messages, topo, filename):
         containers.append({"name":message.name, "src":topo.nodes[message.src]["name"], "dst":topo.nodes[message.dst]["name"], "downloaded":downloaded, "download_time": message.finish_time-message.arrival_time})
     json.dump(containers, file)
     file.write("}")
+    file.close()
 
 def chain_time(messages, filename):
 
@@ -121,6 +126,7 @@ def chain_time(messages, filename):
          #file.write(json.dumps(chain["messages"]))
     file.write(json.dumps(tmp))
     file.write("}")
+    file.close()
 
 def network_log(logs, topo, filename):
 
@@ -134,6 +140,7 @@ def network_log(logs, topo, filename):
 
     file.write(json.dumps(json_graph.node_link_data(topo)))
     file.write("}")
+    file.close()
 
 def registry_usage(messages, topo, filename):
     file = open('reports/'+filename+"-registry_usage.json", 'w')
@@ -143,7 +150,7 @@ def registry_usage(messages, topo, filename):
         if topo.nodes[message.src]["name"] in registries.keys():
             registries[topo.nodes[message.src]["name"]] += 1
         else:
-            registries[topo.nodes[message.src]["name"]] = 0
+            registries[topo.nodes[message.src]["name"]] = 1
     jsonRegistry = []
     for name,number in registries.items():
         jsonRegistry.append({"name":name, "numberOfRequests":number})
@@ -151,3 +158,4 @@ def registry_usage(messages, topo, filename):
     file.write(json.dumps(jsonRegistry))
 
     file.write("}")
+    file.close()

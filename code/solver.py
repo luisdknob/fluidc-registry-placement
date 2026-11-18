@@ -2,6 +2,7 @@
 
 import networkx as nx
 import operator
+import random
 import sys
 import pathlib
 import statistics
@@ -91,6 +92,9 @@ def fluid_communities(g,n):
 filename = pathlib.Path(sys.argv[1])
 #read n number of communities
 n = int(sys.argv[2])
+#optional seed: python solver.py topology k [seed]
+if len(sys.argv) > 3:
+    random.seed(int(sys.argv[3]))
 #start the graph
 g = net_init(filename)
 

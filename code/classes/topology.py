@@ -154,7 +154,7 @@ class Topology:
     def running_messages(self, sec):
         # for each new sim time, run on each message that not be installed or failed
 
-        for message in self.schedule_messages:
+        for message in list(self.schedule_messages):
     
             # if message arrival time bigger than the actual sim time, break the loop
 
@@ -277,6 +277,11 @@ class Topology:
             else:
                 time_spend_cycle = min(times.values())
   
+        # COMPATIBILITY PATCH (cache-fixed): never advance with a non-positive
+        # step; a zero step would stall the simulation.
+        if time_spend_cycle <= 0:
+            time_spend_cycle = min([t for t in times.values() if t > 0], default=1.0)
+
         # after discover the minimum time spend on cycle, update all flows with the data transmitted
 
         for id, value in self.rates.items():
@@ -314,26 +319,24 @@ class Topology:
     def __control_cache(self, node, layer, size, time):
         node = self.topo.nodes[node]
 
+        # cache-fixed: Message.size and storageSize are both in Mb.
+        # The paper's 600 MB cache is storageSize=4800.
         if node["storageSize"] == 0.0:
             node["cache"][1] += 1
             return
 
-        if sum([layer[1] for layer in node["layers"]])+size > node["storageSize"] or any(layer in i for i in node["layers"]):
-            old = ("", 0, time)
-            for cont in node["layers"]:
-                if cont[0] == layer:
-                    cont = (layer, size, time)
-                    node["cache"][0] += 1
-                    return
-                if old[2] > cont[2]:
-                    old = (cont[0], cont[1], cont[2])
-            
+        for index, cont in enumerate(node["layers"]):
+            if cont[0] == layer:
+                if node.get("cachePolicy", "FIFO") == "LRU":
+                    node["layers"][index] = (layer, size, time)
+                node["cache"][0] += 1
+                return
+
+        while node["layers"] and sum([cont[1] for cont in node["layers"]]) + size > node["storageSize"]:
+            old = min(node["layers"], key=lambda cont: cont[2])
             log.debug("ST: %02.2f - Remove layer %s from node %s because the cache is full" % (time, old[0], node["name"]))
-            try:
-                node["layers"].remove(old)
-            except:
-                print(node["layers"], old, any(layer in i for i in node["layers"]), sum([layer[1] for layer in node["layers"]])+size, node["storageSize"])
-        
+            node["layers"].remove(old)
+
         log.debug("ST: %02.2f - Add layer %s on node %s cache" % (time, layer, node["name"]))
         node["layers"].append((layer, size, time))
         node["cache"][1] += 1

@@ -4,17 +4,6 @@ This repository contains the ContainerSim experiments for IC2E 2021. The study u
 
 Luis Augusto Dias Knob, Francescomaria Faticanti, Tiago Ferreto, and Domenico Siracusa (2021). *Community-based Placement of Registries to Speed Up Application Deployment on Edge Computing*. IEEE International Conference on Cloud Engineering. [Paper](https://doi.org/10.1109/IC2E52221.2021.00029)
 
-## Release Note
-
-> [!NOTE]
-> This post-publication release is part of an ongoing effort to improve the reproducibility and verifiability of my research. For this paper, I am making the source code and experimental configurations publicly available. I plan to gradually release artifacts from more of my research projects over time.
->
-> I used GPT-6.2 Sol and DeepSeek V4.1 Flash 1017 to help prepare this repository, fix minor execution issues, and review the code and results against the published paper. I kept the code here as close as possible to the implementation used in the original experiments.
->
-> I used a random function to break ties between registries. I didn’t set a seed for the original runs, so the simulator used the current time. If you run the experiments again, the overall results can be similar even if some requests go to different registries and take a different amount of time. See [Archived Replay](#archived-replay) for how the new runs compare with the originals.
->
-> I documented minor corrections and clarifications in the [errata](ERRATA.md). The results still support the paper’s main conclusions.
-
 ## Simulation Scenario
 
 The experiments use 13 container images of 200 MB each and evaluate both placements with 1, 2, 4, and 8 registries.
@@ -29,9 +18,9 @@ The PESS experiment uses a precomputed schedule from *Progressive Embedding of S
 
 ### Dataset
 
-- The [original source archive](archive/ic2e-original-source.zip) includes the paper-era simulator, the recovered solver copies, and the original Figure 3 plotting script.
+- The original Python files, plotting script, and recovered solver copies are available in the source archive on `main`.
 - The [archived Figure 3 reports](expected/README.md) contain the original container timing data. The [manifest](expected/manifest.csv) identifies the report and recovered registry set for each configuration.
-- The [original simulator logs](archive/ic2e-original-logs.zip) include the 13 detailed logs matched to Figure 3 reports and an index of the matches.
+- The original simulator logs and their Figure 3 index are in `archive/ic2e-original-logs.zip` on `main`.
 - The runnable copy uses the included [topologies, workloads, and FluidC placements](data/README.md). The [data notes](data/README.md#runnable-copy) describe its compatibility adjustments.
 
 ### Settings and Execution
@@ -77,11 +66,11 @@ python scripts/validate.py
 
 The [Figure 3 data and replay notes](expected/README.md) explain the plot filter and how fresh runs compare with the archive.
 
-The paper version on `main` uses FIFO. The `cache-fixed` branch defaults to LRU and provides `--cache-policy FIFO` for a control within that branch. The branch comparison is in `expected/CACHE_COMPARISON.md` on `cache-fixed`.
+The paper version on `main` uses FIFO. The `cache-fixed` branch defaults to LRU and provides `--cache-policy FIFO` for a control within that branch. See the [branch comparison](expected/CACHE_COMPARISON.md) for the matched one-hour runs and the findings.
 
 ### Archived Replay
 
-All six one-registry configurations reproduced the archived report records on `main`. The order of the registries also affects how ties are broken. See the [replay notes](expected/README.md#archived-replay) for the comparison with the archived results.
+All six one-registry configurations reproduced the archived report records on `main`. The original routing seed and registry order remain unknown for the multi-registry runs. See the [replay notes](expected/README.md#archived-replay) for the comparison with the archived results.
 
 ## Citation
 

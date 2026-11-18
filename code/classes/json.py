@@ -22,6 +22,7 @@ def create_node(template):
         node["storageSize"] = 0
     if "simultaneousDownload" in template.keys():
         node["simultaneousDownload"] = template["simultaneousDownload"]
+    node["cachePolicy"] = template.get("cachePolicy", "FIFO")
     node["cache"] = [0,0]
     if template["type"] == "chost":
         node["scheduledLayers"] = 0
@@ -33,7 +34,7 @@ def create_interfaces(template):
     interfaces.append((template["hostId"],
                        template['connectedto'],
                        {"id":uuid().int, "bandwidth":template['bandwidth'], "inverse_bandwidth":1/template["bandwidth"], "activeMessages":[]}))
-    if "bidirectional" in template.keys():
+    if template.get("bidirectional"):
         interfaces.append((template['connectedto'],
                            template["hostId"],
                            {"id":uuid().int, "bandwidth":template['bandwidth'], "inverse_bandwidth":1/template["bandwidth"], "activeMessages":[]}))
@@ -59,7 +60,7 @@ def scheduling_app(policy, chosts, **options):
             rHost = random.choice(list(chosts.keys()))
         rCh.append(rHost)
         if len(rCh) == len(chosts):
-            rCh = []
+            rCh.clear()
         
         src = chosts[rHost]
 
@@ -111,7 +112,7 @@ def import_config(JSONFile, preNodes=None,seed=None):
     jointNameObject = {}
     edges = []
     
-    if seed:
+    if seed is not None:
         random.seed(seed)
     else:
         random.seed(datetime.now())
@@ -356,6 +357,8 @@ def import_topology(file, options):
         options["simDownload"] = 3
     if not "storageSize" in options:
         options["storageSize"] = 4800.0
+    if not "cachePolicy" in options:
+        options["cachePolicy"] = "LRU"
 
     registry = []
     #pool = random.choices(["N%d" % (b) for b in range(0,100)], k=4)
@@ -379,7 +382,7 @@ def import_topology(file, options):
 
             #registry = ["registry-N8","registry-N59","registry-N66","registry-N47"]
             template = {"type": options["type"], 
-                    "name": lineArray[0], "registry":registry, "simultaneousDownload":options["simDownload"], "storageSize":options["storageSize"], "cache":[0,0],
+                    "name": lineArray[0], "registry":registry, "simultaneousDownload":options["simDownload"], "storageSize":options["storageSize"], "cachePolicy":options["cachePolicy"], "cache":[0,0],
                     "pos":pos}
             node = create_node(template)
             jointNameObject[node["name"]] = node

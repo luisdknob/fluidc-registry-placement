@@ -27,6 +27,7 @@ def parse_args():
     p.add_argument("--netlimit", type=float, default=0.1)
     p.add_argument("--storage", type=float, default=4800.0,
                    help="cache size in Mb; 4800 = 600 MB (paper value)")
+    p.add_argument("--cache-policy", choices=["FIFO", "LRU"], default="LRU")
     p.add_argument("--sim", type=int, default=3)
     p.add_argument("--seed", type=int, default=1)
     p.add_argument("--outdir", default=os.path.join(ROOT, "results"))
@@ -57,6 +58,7 @@ def main():
     options = {
         "storageSize": a.storage,
         "simDownload": a.sim,
+        "cachePolicy": a.cache_policy,
         "registries": [x for x in a.registries.split(",") if x],
     }
     cmd = [

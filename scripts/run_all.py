@@ -91,6 +91,8 @@ def build_jobs(args):
                     "workload": os.path.join(DATA, "workloads", workload),
                     "registries": ",".join(pool),
                     "netlimit": netlimit,
+                    "storage": args.storage,
+                    "cache_policy": args.cache_policy,
                 })
     return jobs
 
@@ -103,8 +105,9 @@ def run_job(job, outdir):
         "--workload", job["workload"],
         "--registries", job["registries"],
         "--netlimit", str(job["netlimit"]),
-        "--storage", "4800",
+        "--storage", str(job.get("storage", 4800)),
         "--sim", "3",
+        "--cache-policy", job.get("cache_policy", "LRU"),
         "--seed", "1",
         "--outdir", outdir,
     ]
@@ -118,6 +121,9 @@ def main():
                     help="draw a new baseline with this seed instead of the archived registry sets")
     ap.add_argument("--quick", action="store_true", help="10-minute workloads where available")
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--storage", type=float, default=4800.0,
+                    help="cache size in Mb; 4800 = 600 MB (paper value)")
+    ap.add_argument("--cache-policy", choices=["FIFO", "LRU"], default="LRU")
     ap.add_argument("--garr-netlimit", type=float, default=0.1,
                     help="GARR bandwidth cap (paper Figure 3 uses 0.1)")
     ap.add_argument("--rt-netlimit", type=float, default=1.0,
